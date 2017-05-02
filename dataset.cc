@@ -41,9 +41,9 @@
 #include         <TMatrixD.h>
 #include	 <TRandom3.h>
 
+// global stuff
 using            namespace std;
-
-double fullTimeWindow = 10000;	// global time window to sample over, in seconds
+double fullTimeWindow = 10000;	// time window to sample over, in seconds
 
 // Plotting functions.
 void PlotHist(TCanvas *C, int styleIndex, int canvasIndex, TH1D *hPlot, TString title, TString command);
@@ -52,8 +52,6 @@ void PlotFunc(TCanvas *C, int styleIndex, int canvasIndex, TF1 *fPlot, TString c
 
 // Useful functions for getting the math done.
 void FillOneEvent(TH1D* h, TRandom3* factor, double normalizer);
-
-// Function that does the math we care about i.e. the rate model
 double DetectionRate(double time);
 
 // Used for visualization, keeps the graph on screen.
