@@ -1,0 +1,7 @@
+May 2, 2017
+
+Code written by Xuan Sun at Caltech.
+
+This repo is intended to simulate and characterize the noise in the SQUID detectors.
+
+dataset.cc generates a Monte Carlo dataset.
