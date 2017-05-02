@@ -63,6 +63,8 @@ TApplication plot_program("FADC_readin",0,0,0,0);
 
 int main(int argc, char *argv[])
 {
+  TFile fOut("dataset.root","RECREATE");
+
   TCanvas *C = new TCanvas("canvas", "canvas");
 
   // Ensures the seed is different for randomizing in ROOT.
@@ -89,6 +91,8 @@ int main(int argc, char *argv[])
   }
 
   PlotHist(C, 1, 1, hEvts, "Sampled Events", "");
+
+  fOut.Write();
 
   // Save our plot and print it out as a pdf.
   C -> Print("output_dataset.pdf");
