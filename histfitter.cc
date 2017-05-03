@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   double phi_B = 5;             // other background, in Hertz
 
   // read in a data file
-  TFile fIn("SimData/dataset.root","READ");
+  TFile fIn("SimData/dataset_1mill.root","READ");
 
   // create a canvas for visualization of histogram + fit function
   TCanvas *C = new TCanvas("canvas", "canvas");
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 
   // Create our fitting function. Set the seed fit values and give the parameters some names for bookkeeping
   double seedFrequencyValue = 0.1;
-  TF1* fit = new TF1("rate", "[0]*exp(-[1]*x) + [2]*exp(-[1]*x)*(1 - [3]*cos([4]*x)) + [5]", 0, 10000);
+  TF1* fit = new TF1("rate", "([0]*exp(-[1]*x) + [2]*exp(-[1]*x)*(1 - [3]*cos([4]*x)) + [5])", 0, 10000);
   fit->SetParName(0, "Decay amplitude");
   fit->SetParameter(0, N0*(epsilon_beta/Tau_beta));
   fit->SetParName(1, "Time constant");

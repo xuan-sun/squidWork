@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  int maxNbEvents = 10000;
+  int maxNbEvents = 1000000;
   for(int i = 0; i < maxNbEvents; i++)
   {
     FillOneEvent(hEvts, engine, max);
