@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
   TRandom3* engine = new TRandom3(0);
   gRandom->SetSeed(0);
 
-  TH1D* hEvts = new TH1D("Events", "Events", fullTimeWindow / 10, 0, fullTimeWindow);
+  TH1D* hEvts = new TH1D("Events", "Events", fullTimeWindow / 50, 0, fullTimeWindow);
 
   double max = 0;
   // getting the max value of the sample function in time steps of 0.1
