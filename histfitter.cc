@@ -61,6 +61,13 @@ TApplication plot_program("FADC_readin",0,0,0,0);
 
 int main(int argc, char *argv[])
 {
+  if(argc != 3)
+  {
+    cout << "Incorrect format. Please input: (executable) (seed frequency) (seed phase) " << endl;
+    cout << "Exiting program." << endl;
+    return 0;
+  }
+
   // initial, and approximate, experimental values for use in fit.
   double N0 = 3.8e5;            // number of UCNs at t=0 in each 3000 cc cell
   double Tau_beta = 885;        // beta decay lifetime, in seconds
@@ -77,7 +84,7 @@ int main(int argc, char *argv[])
   double phi_B = 5;             // other background, in Hertz
 
   // read in a data file
-  TFile fIn("SimData/dataset_1mill_bigtBins.root","READ");
+  TFile fIn("SimData/10Hz_1millEvts_1000sFullWindow.root","READ");
 
   // create a canvas for visualization of histogram + fit function
   TCanvas *C = new TCanvas("canvas", "canvas");
@@ -90,20 +97,20 @@ int main(int argc, char *argv[])
   TH1D* hEvts = (TH1D*)fIn.Get("Events");
 
   // Create our fitting function. Set the seed fit values and give the parameters some names for bookkeeping
-  double seedFrequencyValue = 10;
   TF1* fit = new TF1("rate",
-		Form("[0]*(%f*exp(-%f*x) + %f*exp(-%f*x)*(1 - %f*cos(2*M_PI*[1]*x + [2]) + %f))",
+		Form("[0]*(%f*exp(-%f*x) + %f*exp(-%f*x)*(1 - %f*cos(2*TMath::Pi()*[1]*x + [2]) + %f))",
 			N0*(epsilon_beta/Tau_beta),
 			Gamma_p,
 			N0*(epsilon_3/Tau_3),
 			Gamma_p,
 			P3*Pn,
 			phi_B),
-		0, 1000);
+		0, 100);
   fit->SetParName(0, "Global normalization");
   fit->SetParName(1, "Frequency");
-  fit->SetParameter(1, seedFrequencyValue);
+  fit->SetParameter(1, atof(argv[1]));
   fit->SetParName(2, "Phase offset");
+  fit->SetParameter(2, atof(argv[2]));
 
   // fit histogram and plot.
   hEvts->Fit("rate");
