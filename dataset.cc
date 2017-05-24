@@ -43,7 +43,7 @@
 
 // global stuff
 using            namespace std;
-double fullTimeWindow = 10000;	// time window to sample over, in seconds
+double fullTimeWindow = 1000;	// time window to sample over, in seconds
 
 // Plotting functions.
 void PlotHist(TCanvas *C, int styleIndex, int canvasIndex, TH1D *hPlot, TString title, TString command);
@@ -71,13 +71,15 @@ int main(int argc, char *argv[])
   TRandom3* engine = new TRandom3(0);
   gRandom->SetSeed(0);
 
-  TH1D* hEvts = new TH1D("Events", "Events", fullTimeWindow / 10, 0, fullTimeWindow);
+  int nBins = fullTimeWindow*100;	// this is 10 ms windows
+
+  TH1D* hEvts = new TH1D("Events", "Events", nBins, 0, fullTimeWindow);
 
   double max = 0;
-  // getting the max value of the sample function in time steps of 0.1
-  for(int i = 0; i < fullTimeWindow*10; i++)
+  // getting the max value of the sample function in time steps 100x smaller than bin width
+  for(int i = 0; i < nBins*100; i++)
   {
-    double valueAti = DetectionRate(0.1*i);
+    double valueAti = DetectionRate(0.01*i);
     if(valueAti > max)
     {
       max = valueAti;
@@ -142,9 +144,10 @@ double DetectionRate(double time)
   double epsilon_3 = 0.93;	// detection efficiency for UCN-He3 absorption, fraction
   double epsilon_beta = 0.5;	// detection efficiency for beta decay, fraction
   double phi_B = 5;		// other background, in Hertz
+  double frequency = 10;	// frequency of oscillation in Hertz
 
   double rateAtTime_time = N0*(epsilon_beta/Tau_beta)*exp(-Gamma_p*time)
-			 + N0*(epsilon_3/Tau_3)*exp(-Gamma_p*time)*(1 - P3*Pn*cos(0.1*time))
+			 + N0*(epsilon_3/Tau_3)*exp(-Gamma_p*time)*(1 - P3*Pn*cos(2*M_PI*frequency*time))
 			 + phi_B;
 
   return rateAtTime_time;
