@@ -90,16 +90,16 @@ int main(int argc, char *argv[])
   TH1D* hEvts = (TH1D*)fIn.Get("Events");
 
   // Create our fitting function. Set the seed fit values and give the parameters some names for bookkeeping
-  double seedFrequencyValue = 0.1;
+  double seedFrequencyValue = 10;
   TF1* fit = new TF1("rate",
-		Form("[0]*(%f*exp(-%f*x) + %f*exp(-%f*x)*(1 - %f*cos([1]*x + [2]) + %f))",
+		Form("[0]*(%f*exp(-%f*x) + %f*exp(-%f*x)*(1 - %f*cos(2*M_PI*[1]*x + [2]) + %f))",
 			N0*(epsilon_beta/Tau_beta),
 			Gamma_p,
 			N0*(epsilon_3/Tau_3),
 			Gamma_p,
 			P3*Pn,
 			phi_B),
-		0, 10000);
+		0, 1000);
   fit->SetParName(0, "Global normalization");
   fit->SetParName(1, "Frequency");
   fit->SetParameter(1, seedFrequencyValue);
