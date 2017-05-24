@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   double phi_B = 5;             // other background, in Hertz
 
   // read in a data file
-  TFile fIn("SimData/dataset_1mill.root","READ");
+  TFile fIn("SimData/dataset_1mill_bigtBins.root","READ");
 
   // create a canvas for visualization of histogram + fit function
   TCanvas *C = new TCanvas("canvas", "canvas");
@@ -91,22 +91,25 @@ int main(int argc, char *argv[])
 
   // Create our fitting function. Set the seed fit values and give the parameters some names for bookkeeping
   double seedFrequencyValue = 0.1;
-  TF1* fit = new TF1("rate", "([0]*exp(-[1]*x) + [2]*exp(-[1]*x)*(1 - [3]*cos([4]*x)) + [5])", 0, 10000);
-  fit->SetParName(0, "Decay amplitude");
-  fit->SetParameter(0, N0*(epsilon_beta/Tau_beta));
-  fit->SetParName(1, "Time constant");
-  fit->SetParameter(1, Gamma_p);
-  fit->SetParName(2, "Oscillatory amplitude");
-  fit->SetParameter(2, N0*(epsilon_3/Tau_3));
-  fit->SetParName(3, "Total polarization");
-  fit->SetParameter(3, P3*Pn);
-  fit->SetParName(4, "Frequency");
-  fit->SetParameter(4, seedFrequencyValue);
-  fit->SetParName(5, "Background offset");
-  fit->SetParameter(5, phi_B);
+  TF1* fit = new TF1("rate",
+		Form("[0]*(%f*exp(-%f*x) + %f*exp(-%f*x)*(1 - %f*cos([1]*x + [2]) + %f))",
+			N0*(epsilon_beta/Tau_beta),
+			Gamma_p,
+			N0*(epsilon_3/Tau_3),
+			Gamma_p,
+			P3*Pn,
+			phi_B),
+		0, 10000);
+  fit->SetParName(0, "Global normalization");
+  fit->SetParName(1, "Frequency");
+  fit->SetParameter(1, seedFrequencyValue);
+  fit->SetParName(2, "Phase offset");
 
   // fit histogram and plot.
   hEvts->Fit("rate");
+  TF1* fitResult = hEvts->GetFunction("rate");
+  cout << "The Chi-squared per DoF is " << fitResult->GetChisquare() /fitResult->GetNDF() << endl; 
+
   PlotHist(C, 1, 1, hEvts, "Events", "");
 
   // Save our plot and print it out as a pdf.
