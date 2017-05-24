@@ -64,7 +64,7 @@ TApplication plot_program("FADC_readin",0,0,0,0);
 int main(int argc, char *argv[])
 {
   TFile fOut("dataset.root","RECREATE");
-
+  // creating canvas for plotting
   TCanvas *C = new TCanvas("canvas", "canvas");
 
   // Ensures the seed is different for randomizing in ROOT.
