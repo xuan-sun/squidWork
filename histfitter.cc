@@ -72,19 +72,20 @@ int main(int argc, char *argv[])
   double N0 = 3.8e5;            // number of UCNs at t=0 in each 3000 cc cell
   double Tau_beta = 885;        // beta decay lifetime, in seconds
   double Tau_3 = 500;           // UCN-Helium3 absorption time, in seconds
-//  double Tau_cell = 2000;     // UCN-wall absorption time, in seconds
+  double Tau_cell = 2000;     // UCN-wall absorption time, in seconds
 //  double T_m = 1000;          // measurement time, in seconds
 //  double T_f = 1000;          // cold neutron fill time, in seconds
 //  double T_d = 400;           // dead time between cycles
   double P3 = 0.98;             // Helium3 initial polarization, fraction
   double Pn = 0.98;             // UCN initial polarization, fraction
   double Gamma_p = 1.0/20000;   // He3 and UCN depolarization rate, in inverse seconds
+  double Gamma_T = (1.0/Tau_beta + 1.0/Tau_3 + 1.0/Tau_cell);	// Gamma_T for time decay
   double epsilon_3 = 0.93;      // detection efficiency for UCN-He3 absorption, fraction
   double epsilon_beta = 0.5;    // detection efficiency for beta decay, fraction
   double phi_B = 5;             // other background, in Hertz
 
   // read in a data file
-  TFile fIn("SimData/10Hz_1millEvts_1000sFullWindow.root","READ");
+  TFile fIn("SimData/100mill_10Hz_10msBins.root","READ");
 
   // create a canvas for visualization of histogram + fit function
   TCanvas *C = new TCanvas("canvas", "canvas");
@@ -98,14 +99,14 @@ int main(int argc, char *argv[])
 
   // Create our fitting function. Set the seed fit values and give the parameters some names for bookkeeping
   TF1* fit = new TF1("rate",
-		Form("[0]*(%f*exp(-%f*x) + %f*exp(-%f*x)*(1 - %f*cos(2*TMath::Pi()*[1]*x + [2]) + %f))",
+		Form("[0]*(%f*exp(-%f*x) + %f*exp(-%f*x)*(1 - %f*cos(2*TMath::Pi()*[1]*x + [2])) + %f)",
 			N0*(epsilon_beta/Tau_beta),
-			Gamma_p,
+			Gamma_T,
 			N0*(epsilon_3/Tau_3),
-			Gamma_p,
+			Gamma_T,
 			P3*Pn,
 			phi_B),
-		0, 100);
+		0, 1000);
   fit->SetParName(0, "Global normalization");
   fit->SetParName(1, "Frequency");
   fit->SetParameter(1, atof(argv[1]));
@@ -115,7 +116,9 @@ int main(int argc, char *argv[])
   // fit histogram and plot.
   hEvts->Fit("rate");
   TF1* fitResult = hEvts->GetFunction("rate");
-  cout << "The Chi-squared per DoF is " << fitResult->GetChisquare() /fitResult->GetNDF() << endl; 
+  cout << "The Chi-squared is " << fitResult->GetChisquare() << " \n"
+       << "NDF is " << fitResult->GetNDF() << " \n"
+       << "Chi-squared per degree of freedom is " << fitResult->GetChisquare() / fitResult->GetNDF() << endl;
 
   PlotHist(C, 1, 1, hEvts, "Events", "");
 
@@ -153,6 +156,7 @@ void PlotHist(TCanvas *C, int styleIndex, int canvasIndex, TH1D *hPlot, TString 
   hPlot -> SetTitle(title);
   hPlot -> GetXaxis() -> SetTitle("Time (s)");
   hPlot -> GetXaxis() -> CenterTitle();
+//  hPlot -> GetXaxis() -> SetRangeUser(0, 1.5);
   hPlot -> GetYaxis() -> SetTitle("Counts (N)");
   hPlot -> GetYaxis() -> CenterTitle();
 //  hPlot -> GetYaxis() -> SetRangeUser(0, 0.000004);

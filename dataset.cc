@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
   TRandom3* engine = new TRandom3(0);
   gRandom->SetSeed(0);
 
-  int nBins = fullTimeWindow*100;	// this is 10 ms windows
+  int nBins = fullTimeWindow*100;	// this is 1/100 s time bins (i.e. time windows)
 
   TH1D* hEvts = new TH1D("Events", "Events", nBins, 0, fullTimeWindow);
 
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     }
   }
 
-  int maxNbEvents = 1000000;
+  int maxNbEvents = 10000000;
   for(int i = 0; i < maxNbEvents; i++)
   {
     FillOneEvent(hEvts, engine, max);
@@ -134,20 +134,21 @@ double DetectionRate(double time)
   double N0 = 3.8e5;		// number of UCNs at t=0 in each 3000 cc cell
   double Tau_beta = 885;	// beta decay lifetime, in seconds
   double Tau_3 = 500;		// UCN-Helium3 absorption time, in seconds
-//  double Tau_cell = 2000;	// UCN-wall absorption time, in seconds
+  double Tau_cell = 2000;	// UCN-wall absorption time, in seconds
 //  double T_m = 1000;		// measurement time, in seconds
 //  double T_f = 1000;		// cold neutron fill time, in seconds
 //  double T_d = 400;		// dead time between cycles
   double P3 = 0.98;		// Helium3 initial polarization, fraction
   double Pn = 0.98;		// UCN initial polarization, fraction
   double Gamma_p = 1.0/20000;	// He3 and UCN depolarization rate, in inverse seconds
+  double Gamma_T = (1.0/Tau_beta + 1.0/Tau_3 + 1.0/Tau_cell);	// Gamma T for rate function
   double epsilon_3 = 0.93;	// detection efficiency for UCN-He3 absorption, fraction
   double epsilon_beta = 0.5;	// detection efficiency for beta decay, fraction
   double phi_B = 5;		// other background, in Hertz
   double frequency = 10;	// frequency of oscillation in Hertz
 
-  double rateAtTime_time = N0*(epsilon_beta/Tau_beta)*exp(-Gamma_p*time)
-			 + N0*(epsilon_3/Tau_3)*exp(-Gamma_p*time)*(1 - P3*Pn*cos(2*M_PI*frequency*time))
+  double rateAtTime_time = N0*(epsilon_beta/Tau_beta)*exp(-Gamma_T*time)
+			 + N0*(epsilon_3/Tau_3)*exp(-Gamma_T*time)*(1 - P3*Pn*cos(2*M_PI*frequency*time))
 			 + phi_B;
 
   return rateAtTime_time;
