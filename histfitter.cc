@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
   double phi_B = 5;             // other background, in Hertz
 
   // read in a data file
-  TFile fIn("SimData/100mill_10Hz_10msBins.root","READ");
+  TFile fIn("SimData/10mill_10Hz_10msBins_wBkgd.root","READ");
 
   // create a canvas for visualization of histogram + fit function
   TCanvas *C = new TCanvas("canvas", "canvas");
@@ -113,14 +113,32 @@ int main(int argc, char *argv[])
   fit->SetParName(2, "Phase offset");
   fit->SetParameter(2, atof(argv[2]));
 
+/*
+  TF1* fit = new TF1("rate", Form("[0]*exp(-%f*x)*(1 - %f*cos(2*TMath::Pi()*[1]*x + [2])) + [3]",
+				Gamma_T,
+				(epsilon_3*P3*Pn)/(Tau_3*(epsilon_beta/Tau_beta + epsilon_3/Tau_3))),
+				0, 1000);
+  fit->SetParName(0, "Global normalization");
+  fit->SetParName(1, "Frequency");
+  fit->SetParameter(1, atof(argv[1]));
+  fit->SetParName(2, "Phase offset");
+  fit->SetParameter(2, atof(argv[2]));
+  fit->SetParName(3, "Flat background");
+*/
+
+
   // fit histogram and plot.
-  hEvts->Fit("rate");
+  hEvts->Fit("rate", "0");
   TF1* fitResult = hEvts->GetFunction("rate");
   cout << "The Chi-squared is " << fitResult->GetChisquare() << " \n"
        << "NDF is " << fitResult->GetNDF() << " \n"
        << "Chi-squared per degree of freedom is " << fitResult->GetChisquare() / fitResult->GetNDF() << endl;
 
   PlotHist(C, 1, 1, hEvts, "Events", "");
+
+  fitResult->SetLineWidth(5);
+  fitResult->SetLineColor(3);
+  fitResult->Draw("SAMEAL");
 
   // Save our plot and print it out as a pdf.
   C -> Print("output_histfitter.pdf");

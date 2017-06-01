@@ -19,8 +19,8 @@ LIBS          = $(ROOTLIBS) $(ROOTGLIBS)
 CXXFLAGS     += $(ROOTCFLAGS)
 LIBS         += -lSpectrum -lMinuit
 
-objects = histfitter.o
-source = histfitter
+objects = dataset.o
+source = dataset
 
 .PHONY: all
 all: $(source)
