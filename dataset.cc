@@ -59,7 +59,6 @@ double fullTimeWindow = 1000;	// time window to sample over, in seconds
   double epsilon_3 = 0.93;      // detection efficiency for UCN-He3 absorption, fraction
   double epsilon_beta = 0.5;    // detection efficiency for beta decay, fraction
   double phi_B = 5;             // other background, in Hertz
-  double frequency = 10;        // frequency of oscillation in Hertz
 
 
 
@@ -104,14 +103,14 @@ int main(int argc, char *argv[])
     }
   }
 
-  int maxNbEvents = 1000000;
+  int maxNbEvents = 1e9;
   for(int i = 0; i < maxNbEvents; i++)
   {
     FillOneEvent(hEvts, engine, max);
   }
 
   // OPTIONAL: adding the histfitter code here to ensure no carry-over issues.
-  TF1* fit = new TF1("rate",
+/*  TF1* fit = new TF1("rate",
                 Form("[0]*(%f*exp(-%f*x) + %f*exp(-%f*x)*(1 - %f*cos(2*TMath::Pi()*[1]*x + [2])) + %f)",
                         N0*(epsilon_beta/Tau_beta),
                         Gamma_T,
@@ -125,6 +124,24 @@ int main(int argc, char *argv[])
   fit->SetParameter(1, 10);
   fit->SetParName(2, "Phase offset");
   fit->SetParameter(2, 0);
+*/
+  TF1* fit = new TF1("rate",
+		Form("[0]*exp(-[5]*x) + [1]*exp(-[5]*x)*(1 - %f*cos(2*TMath::Pi()*[2]*x + [3])) + [4]" , P3*Pn),
+		0, 1000);
+  fit->SetParName(0, "Amplitude beta decay");
+  fit->SetParName(1, "Amplitude He3 capture");
+  fit->SetParName(2, "Frequency of He3");
+  fit->SetParName(3, "Phase offset of He3");
+  fit->SetParName(4, "Background fraction");
+  fit->SetParName(5, "Gamma T (decay timescale)");
+  fit->SetParameter(0, N0*(epsilon_beta/Tau_beta));
+  fit->SetParameter(1, N0*(epsilon_3/Tau_3));
+  fit->SetParameter(2, 10);
+  fit->SetParameter(3, 0);
+  fit->SetParameter(4, phi_B);
+  fit->SetParameter(5, Gamma_T);
+
+
   hEvts->Fit("rate", "0");
   TF1* fitResult = hEvts->GetFunction("rate");
   cout << "The Chi-squared is " << fitResult->GetChisquare() << " \n"
@@ -192,10 +209,9 @@ double DetectionRate(double time)
   double epsilon_3 = 0.93;	// detection efficiency for UCN-He3 absorption, fraction
   double epsilon_beta = 0.5;	// detection efficiency for beta decay, fraction
   double phi_B = 5;		// other background, in Hertz
-  double frequency = 10;	// frequency of oscillation in Hertz
 */
   double rateAtTime_time = N0*(epsilon_beta/Tau_beta)*exp(-Gamma_T*time)
-			 + N0*(epsilon_3/Tau_3)*exp(-Gamma_T*time)*(1 - P3*Pn*cos(2*M_PI*frequency*time))
+			 + N0*(epsilon_3/Tau_3)*exp(-Gamma_T*time)*(1 - P3*Pn*cos(2*M_PI*10*time))
 			 + phi_B;
 
   return rateAtTime_time;
