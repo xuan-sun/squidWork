@@ -19,8 +19,8 @@ LIBS          = $(ROOTLIBS) $(ROOTGLIBS)
 CXXFLAGS     += $(ROOTCFLAGS)
 LIBS         += -lSpectrum -lMinuit
 
-objects = dataset.o
-source = dataset
+objects = squid_dataset.o
+source = squid_dataset
 
 .PHONY: all
 all: $(source)
@@ -39,4 +39,4 @@ $(source): $(objects)
 #	@echo "$@ done"
 
 clean:
-		@rm -f *.o *~  core $(source)
+		@rm -f *.o *~  core $(source) *.root *.pdf
