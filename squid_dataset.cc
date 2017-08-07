@@ -102,9 +102,10 @@ int main(int argc, char *argv[])
 
   vector < pair < double, double > > timeAndFrequencyOfSQUID;
   double timeStep = 0.01;
-  double frequency = 10;	// setting first frequency value to 10 Hz
+  double frequency = 10;	// setting frequency value at t = 0 to 10 Hz
   for(double t = 0; t < alpha*T_m; t = t + timeStep)
   {
+    frequency = 10 + t*10;	// frequency offset of 10 Hz, slope of 0.1Hz "slow drift"
     if(fmod(t, 42) < timeStep)	// at each 42s increment, sample and change our frequency in SQUID function
     {
       // with equal probability, change the frequency from previous time "chunk" by 3Hz
